@@ -157,16 +157,17 @@ export const Game = () => {
         peer.current?.peer?.addEventListener("track", async (ev) => {
             const [remote] = ev.streams;
             // console.log("remoteStream1: ");
-            // const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
-            // if (remoteVideoRef === null) {
-            //     console.error('Remote video element not found');
-            //     return;
-            // }
+            const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+            if (remoteVideoRef === null) {
+                console.error('Remote video element not found');
+            }
+            else{
+                console.log("remoteStream3: ", remoteVideoRef.srcObject);
+                remoteVideoRef.srcObject = remote;
+            }
             console.log("remoteStream2: ", remote);
             setRemoteStream(remote);
             
-            // remoteVideoRef.srcObject = remote;
-            // console.log("remoteStream3: ", remoteVideoRef.srcObject);
             console.log("track event ------------ ");
 
         });
