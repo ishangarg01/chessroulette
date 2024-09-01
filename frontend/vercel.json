@@ -1,7 +1,7 @@
 {
     "headers": [
       {
-        "source": "/:path*",
+        "source": "/game",
         "headers": [
           {
             "key": "Permissions-Policy",
