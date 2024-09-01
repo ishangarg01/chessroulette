@@ -32,7 +32,7 @@ export const Game = () => {
     const [myStream, setMyStream] = useState<MediaStream|null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
     
-    const [, setAnswerHandled] = useState(false);
+    // const [, setAnswerHandled] = useState(false);
 
     useEffect(() => {
         if (socket) {
