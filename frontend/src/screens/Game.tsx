@@ -4,7 +4,7 @@ import { ChessBoard } from "../components/ChessBoard"
 import { useSocket } from "../hooks/useSocket"
 import { Chess } from "chess.js";
 import PeerService from '../services/peer';
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 
 export const INIT_GAME = "init_game";
