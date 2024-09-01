@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "../components/Button"
 import { ChessBoard } from "../components/ChessBoard"
 import { useSocket } from "../hooks/useSocket"
-import { Chess, WHITE } from "chess.js";
+import { Chess } from "chess.js";
 import PeerService from '../services/peer';
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +18,7 @@ export const ADD_TRACKS = "add_tracks";
 
 export const Game = () => {
     const socket = useSocket();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
 
     const peer = useRef<PeerService | null>(null); // Use useRef to store PeerService instance
@@ -32,7 +32,7 @@ export const Game = () => {
     const [myStream, setMyStream] = useState<MediaStream|null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
     
-    const [answerHandled, setAnswerHandled] = useState(false);
+    const [, setAnswerHandled] = useState(false);
 
     useEffect(() => {
         if (socket) {
@@ -258,7 +258,7 @@ export const Game = () => {
         <div className="pt-8 max-w-screen-lg w-full">
             <div className="grid grid-cols-6 gap-4 w-full">
                 <div className="col-span-4 w-full flex justify-center">
-                    <ChessBoard colour={colour}chess={chess} setBoard={setBoard} socket={socket} board = {board} />
+                    <ChessBoard colour={colour} socket={socket} board = {board} />
                 </div>
                 <div className="col-span-2 w-full bg-slate-900 flex justify-center">
                     <div className="pt-8">
