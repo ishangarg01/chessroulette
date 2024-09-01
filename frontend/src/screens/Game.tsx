@@ -95,14 +95,14 @@ export const Game = () => {
         await peer.current.peer.setRemoteDescription(new RTCSessionDescription(offer));
         console.log("handleOffer : set remote description : ", peer.current.peer.remoteDescription);
         
-        if (iceCandidates.current.length > 0) {
-            console.log('Adding stored ICE candidates...');
-            for (const candidate of iceCandidates.current) {
-                await peer.current?.peer?.addIceCandidate(candidate);
-                console.log('Adding ICE candidate...in hadle offer 1: ', candidate);
-            }
-            iceCandidates.current = []; // Clear the list after adding
-        }
+        // if (iceCandidates.current.length > 0) {
+        //     console.log('Adding stored ICE candidates...');
+        //     for (const candidate of iceCandidates.current) {
+        //         await peer.current?.peer?.addIceCandidate(candidate);
+        //         console.log('Adding ICE candidate...in hadle offer 1: ', candidate);
+        //     }
+        //     iceCandidates.current = []; // Clear the list after adding
+        // }
         
 
         const ans = await peer.current.peer.createAnswer();

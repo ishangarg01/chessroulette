@@ -27,6 +27,7 @@ export const ChessBoard = ({colour,board, socket} :
                     return <div onClick={() => {
                         if(!from){
                             setFrom(squareRepresentation);
+                            console.log("move from ",from);
                         }
                         else {
                             socket.send(JSON.stringify({
