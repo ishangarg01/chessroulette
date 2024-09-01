@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const WS_URL = "ws://localhost:8080";
+const WS_URL = "https://chessroulette.onrender.com";
 // const WS_URL = "ws://192.168.207.146:8080";
 
 export const useSocket = () => {
