@@ -80,6 +80,7 @@ export const Game = () => {
         });
         
         console.log("handleOffer : started a stream : ", stream);
+        
 
         for (const track of stream.getTracks()) {
             peer.current.peer?.addTrack(track, stream);
@@ -93,7 +94,15 @@ export const Game = () => {
 
         await peer.current.peer.setRemoteDescription(new RTCSessionDescription(offer));
         console.log("handleOffer : set remote description : ", peer.current.peer.remoteDescription);
-
+        
+        if (iceCandidates.current.length > 0) {
+            console.log('Adding stored ICE candidates...');
+            for (const candidate of iceCandidates.current) {
+                await peer.current?.peer?.addIceCandidate(candidate);
+                console.log('Adding ICE candidate...in hadle offer 1: ', candidate);
+            }
+            iceCandidates.current = []; // Clear the list after adding
+        }
         
 
         const ans = await peer.current.peer.createAnswer();
@@ -287,8 +296,9 @@ export const Game = () => {
                                 }
                                 iceCandidates.current = []; // Clear the list after adding
                             }
+                            setRemoteStream(remoteStream);
 
-                            console.log("remoteStream assigned to video element: ");
+                            // console.log("remoteStream assigned to video element: ");
                             const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
                             if (remoteVideoRef) {
                                 remoteVideoRef.srcObject = remoteStream;
