@@ -134,6 +134,7 @@ export const Game = () => {
             console.log('Adding stored ICE candidates...');
             for (const candidate of iceCandidates.current) {
                 await peer.current?.peer?.addIceCandidate(candidate);
+                console.log('Adding ICE candidate...in hadle answer: ', candidate);
             }
             iceCandidates.current = []; // Clear the list after adding
         }
@@ -273,7 +274,18 @@ export const Game = () => {
                         {started && colour && <div className="text-white flex justify-center">{colour}</div>}
                         { started && myStream && <video id="local-video" autoPlay playsInline controls></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
-                        {started && <div className="flex justify-center"><Button onclick={()=>{
+                        { started && <div className="flex justify-center"><Button onclick={()=>{
+                            if (iceCandidates.current.length > 0) {
+                                console.log('Adding stored ICE candidates...');
+                                for (const candidate of iceCandidates.current) {
+                                    const addPeerCandidate = async () => {
+                                        await peer.current?.peer?.addIceCandidate(candidate);
+                                    }
+                                    addPeerCandidate();
+                                }
+                                iceCandidates.current = []; // Clear the list after adding
+                            }
+
                             console.log("remoteStream assigned to video element: ");
                             const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
                             if (remoteVideoRef) {
@@ -281,6 +293,7 @@ export const Game = () => {
                                 console.log("remoteStream assigned to video element:", remoteStream);
                             }
                         }}>Refresh</Button></div>}
+                        
                     </div>
                 </div>
             </div>
