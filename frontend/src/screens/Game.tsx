@@ -165,6 +165,7 @@ export const Game = () => {
     useEffect(() => {
         peer.current?.peer?.addEventListener("track", async (ev) => {
             const [remote] = ev.streams;
+            console.log("track got triggered: ", ev.streams[0]);
             // console.log("remoteStream1: ");
             const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
             if (remoteVideoRef === null) {
