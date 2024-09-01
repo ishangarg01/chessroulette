@@ -275,6 +275,7 @@ export const Game = () => {
                         { started && myStream && <video id="local-video" autoPlay playsInline controls></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
                         { started && <div className="flex justify-center"><Button onclick={()=>{
+                            console.log(remoteStream);
                             if (iceCandidates.current.length > 0) {
                                 console.log('Adding stored ICE candidates...');
                                 for (const candidate of iceCandidates.current) {
