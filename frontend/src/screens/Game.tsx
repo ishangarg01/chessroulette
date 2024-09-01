@@ -129,7 +129,7 @@ export const Game = () => {
         console.log("Call Accepted!1");
         await peer.current?.peer?.setRemoteDescription(new RTCSessionDescription(ans));
         console.log("Call Accepted!2 : ", peer.current?.peer?.remoteDescription);
-        setAnswerHandled(true);
+        // setAnswerHandled(true);
         if (iceCandidates.current.length > 0) {
             console.log('Adding stored ICE candidates...');
             for (const candidate of iceCandidates.current) {
@@ -273,6 +273,14 @@ export const Game = () => {
                         {started && colour && <div className="text-white flex justify-center">{colour}</div>}
                         { started && myStream && <video id="local-video" autoPlay playsInline controls></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
+                        {started && <div className="flex justify-center"><Button onclick={()=>{
+                            console.log("remoteStream assigned to video element: ");
+                            const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+                            if (remoteVideoRef) {
+                                remoteVideoRef.srcObject = remoteStream;
+                                console.log("remoteStream assigned to video element:", remoteStream);
+                            }
+                        }}>Refresh</Button></div>}
                     </div>
                 </div>
             </div>
