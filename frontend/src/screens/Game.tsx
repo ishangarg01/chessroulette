@@ -35,7 +35,8 @@ export const Game = () => {
     // Specify MediaStream as the type for both state variables
     const [myStream, setMyStream] = useState<MediaStream|null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
-    
+    const [isConnecting, setIsConnecting] = useState(true); // Track connection state
+
     // const [, setAnswerHandled] = useState(false);
 
     useEffect(() => {
@@ -260,6 +261,14 @@ export const Game = () => {
     useEffect(() => {
         if(!socket) return;
 
+        socket.onopen = () => {
+            setIsConnecting(false); // Connection established
+        };
+
+        socket.onclose = () => {
+            setIsConnecting(true); // Connection closed or lost
+        };
+
         socket.onmessage = async (event) => {
             const message = await JSON.parse(event.data);
             console.log("Message received: ", message);
@@ -323,7 +332,7 @@ export const Game = () => {
                 </div>
                 <div className="col-span-2 w-full bg-slate-900 flex justify-center">
                     <div className="pt-8">
-                        {!started && <Button 
+                        {!started && !isConnecting && <Button 
                             onclick={()=>{
                                 socket.send(JSON.stringify({
                                     type : INIT_GAME,
@@ -331,8 +340,9 @@ export const Game = () => {
                             }} >
                             Play
                         </Button>}
+                        {isConnecting && <div className="text-white">Connecting...</div>}
                         {started && colour && <div className="text-white flex justify-center">{colour}</div>}
-                        { started && myStream && <video id="local-video" autoPlay playsInline controls></video>}
+                        { started && myStream && <video id="local-video" autoPlay playsInline controls muted></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
                         { started && <div className="flex justify-center"><Button onclick={()=>{
                             console.log("remote stream : ", remoteStream);
