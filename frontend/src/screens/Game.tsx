@@ -16,6 +16,10 @@ export const NEGO_OFFER = "offer_for_negotiation";
 export const NEGO_ANSWER = "answer_for_negotiation";
 export const ADD_TRACKS = "add_tracks";
 
+// const peer = new PeerService();
+
+
+
 export const Game = () => {
     const socket = useSocket();
     // const navigate = useNavigate();
@@ -60,6 +64,27 @@ export const Game = () => {
             }
         });
 
+        peer.current?.peer?.addEventListener("track", async (ev) => {
+            const [remote] = ev.streams;
+            console.log("track got triggered: ", ev.streams[0]);
+            // console.log("remoteStream1: ");
+            const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+            if (remoteVideoRef === null) {
+                console.error('Remote video element not found');
+            }
+            else{
+                console.log("remoteStream3: ", remoteVideoRef.srcObject);
+                remoteVideoRef.srcObject = remote;
+            }
+            console.log("remoteStream2: ", remote);
+            setRemoteStream(remote);
+            
+            console.log("track event ------------ ");
+
+        });
+
+
+
         const offer = await peer.current.peer.createOffer();
         console.log("sendOffer : createed offer : ", offer);
     
@@ -78,6 +103,7 @@ export const Game = () => {
             audio: true,
             video: true,
         });
+        setMyStream(stream);
         
         console.log("handleOffer : started a stream : ", stream);
         
@@ -90,6 +116,26 @@ export const Game = () => {
             if (track) {
                 console.log(`handleOffer : sender track: ${track.kind}, ID: ${track.id}`);
             }
+        });
+
+
+        peer.current?.peer?.addEventListener("track", async (ev) => {
+            const [remote] = ev.streams;
+            console.log("track got triggered: ", ev.streams[0]);
+            // console.log("remoteStream1: ");
+            const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+            if (remoteVideoRef === null) {
+                console.error('Remote video element not found');
+            }
+            else{
+                console.log("remoteStream3: ", remoteVideoRef.srcObject);
+                remoteVideoRef.srcObject = remote;
+            }
+            console.log("remoteStream2: ", remote);
+            setRemoteStream(remote);
+            
+            console.log("track event ------------ ");
+
         });
 
         await peer.current.peer.setRemoteDescription(new RTCSessionDescription(offer));
@@ -113,12 +159,12 @@ export const Game = () => {
 
         socket.send(JSON.stringify({ type: ANSWER, data: ans }));
         console.log("handleOffer : sent answer : ", ans);
-        setMyStream(stream);
+        
         console.log("handleOffer : --------- ");
 
         // Now that remote description is set, add any stored ICE candidates
         if (iceCandidates.current.length > 0) {
-            console.log('Adding stored ICE candidates...');
+            console.log('Adding stored ICE candidates...: ', iceCandidates.current.length);
             for (const candidate of iceCandidates.current) {
                 await peer.current?.peer?.addIceCandidate(candidate);
                 console.log('Adding ICE candidate...in hadle offer: ', candidate);
@@ -140,7 +186,7 @@ export const Game = () => {
         console.log("Call Accepted!2 : ", peer.current?.peer?.remoteDescription);
         // setAnswerHandled(true);
         if (iceCandidates.current.length > 0) {
-            console.log('Adding stored ICE candidates...');
+            console.log('Adding stored ICE candidates... : ', iceCandidates.current.length);
             for (const candidate of iceCandidates.current) {
                 await peer.current?.peer?.addIceCandidate(candidate);
                 console.log('Adding ICE candidate...in hadle answer: ', candidate);
@@ -148,12 +194,12 @@ export const Game = () => {
             iceCandidates.current = []; // Clear the list after adding
         }
         console.log("Call Accepted!");
-        const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
-        if (remoteVideoRef === null) {
-            console.error('Remote video element not found');
-            return;
-        }
-        remoteVideoRef.srcObject = remoteStream;
+        // const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+        // if (remoteVideoRef === null) {
+        //     console.error('Remote video element not found');
+        //     return;
+        // }
+        // remoteVideoRef.srcObject = remoteStream;
     },[]); 
 
     useEffect(() => {
@@ -162,26 +208,28 @@ export const Game = () => {
         }
     }, [started]);
 
-    useEffect(() => {
-        peer.current?.peer?.addEventListener("track", async (ev) => {
-            const [remote] = ev.streams;
-            console.log("track got triggered: ", ev.streams[0]);
-            // console.log("remoteStream1: ");
-            const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
-            if (remoteVideoRef === null) {
-                console.error('Remote video element not found');
-            }
-            else{
-                console.log("remoteStream3: ", remoteVideoRef.srcObject);
-                remoteVideoRef.srcObject = remote;
-            }
-            console.log("remoteStream2: ", remote);
-            setRemoteStream(remote);
+    // useEffect(() => {
+    //     console.log(peer.current);
+    //     console.log("track listener added ------------ ");
+    //     peer.current?.peer?.addEventListener("track", async (ev) => {
+    //         const [remote] = ev.streams;
+    //         console.log("track got triggered: ", ev.streams[0]);
+    //         // console.log("remoteStream1: ");
+    //         const remoteVideoRef = document.querySelector<HTMLVideoElement>('#remote-video');
+    //         if (remoteVideoRef === null) {
+    //             console.error('Remote video element not found');
+    //         }
+    //         else{
+    //             console.log("remoteStream3: ", remoteVideoRef.srcObject);
+    //             remoteVideoRef.srcObject = remote;
+    //         }
+    //         console.log("remoteStream2: ", remote);
+    //         setRemoteStream(remote);
             
-            console.log("track event ------------ ");
+    //         console.log("track event ------------ ");
 
-        });
-      }, [peer.current?.peer]);
+    //     });
+    // }, [peer.current?.peer!==null, peer.current!==null]);
     
     useEffect(() => {
         if (remoteStream) {
@@ -196,16 +244,16 @@ export const Game = () => {
 
 
     useEffect(() => {  
-        console.log("myStream1: ", myStream);
+        console.log("local stream is set: ", myStream);
         if (myStream) {
             const localVideoRef = document.querySelector<HTMLVideoElement>('#local-video');
-            console.log("myStream2: ", myStream);
+            // console.log("myStream2: ", myStream);
             if (localVideoRef === null) {
                 console.error('Local video element not found');
                 return;
             }
             localVideoRef.srcObject = myStream;
-            console.log("myStream3: ", localVideoRef.srcObject);
+            // console.log("myStream3: ", localVideoRef.srcObject);
         }
     }, [myStream]);
 
@@ -250,6 +298,7 @@ export const Game = () => {
                     } else {
                         // Otherwise, store the candidate to add it later
                         iceCandidates.current.push(candidate);
+                        console.log('Storing ICE candidate...: ', candidate, iceCandidates.current);
                     }
                     break;
                 default:
@@ -286,7 +335,7 @@ export const Game = () => {
                         { started && myStream && <video id="local-video" autoPlay playsInline controls></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
                         { started && <div className="flex justify-center"><Button onclick={()=>{
-                            console.log(remoteStream);
+                            console.log("remote stream : ", remoteStream);
                             if (iceCandidates.current.length > 0) {
                                 console.log('Adding stored ICE candidates...');
                                 for (const candidate of iceCandidates.current) {
