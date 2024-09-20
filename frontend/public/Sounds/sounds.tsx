@@ -1,1 +1,1 @@
-export const MOVESOUND1 = new Audio('ChessMoveSound.mp3');
+export const MOVESOUND1 = new Audio('/Sounds/ChessMoveSound.mp3');
