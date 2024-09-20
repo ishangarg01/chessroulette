@@ -4,6 +4,8 @@ import { ChessBoard } from "../components/ChessBoard"
 import { useSocket } from "../hooks/useSocket"
 import { Chess } from "chess.js";
 import PeerService from '../services/peer';
+import {MOVESOUND1} from '../../public/Sounds/sounds';
+import { DashBoard } from "../components/DashBoard";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -36,6 +38,7 @@ export const Game = () => {
     const [myStream, setMyStream] = useState<MediaStream|null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
     const [isConnecting, setIsConnecting] = useState(true); // Track connection state
+    const [noOfMoves, setNoOfMoves] = useState(0);
 
     // const [, setAnswerHandled] = useState(false);
 
@@ -284,6 +287,9 @@ export const Game = () => {
                     chess.move(move);
                     setBoard(chess.board());
                     console.log("Move");
+                    console.log(MOVESOUND1);
+                    MOVESOUND1.play();
+                    setNoOfMoves(prevMoves => prevMoves + 1);
                     break;
                 case GAME_OVER:
                     console.log("Game Over");
@@ -341,7 +347,9 @@ export const Game = () => {
                             Play
                         </Button>}
                         {isConnecting && <div className="text-white">Connecting...</div>}
-                        {started && colour && <div className="text-white flex justify-center">{colour}</div>}
+                        {/* {started && colour && <div className="text-white flex justify-center">{colour}</div>} */}
+                        {/* {started && <div className="text-white flex justify-center">{noOfMoves}</div>} */}
+                        <DashBoard noOfMoves={noOfMoves} started={started} colour={colour}/>
                         { started && myStream && <video id="local-video" autoPlay playsInline controls muted></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
                         { started && <div className="flex justify-center"><Button onclick={()=>{
