@@ -7,6 +7,8 @@ console.log(WebSocket); // This should log the WebSocket class
 
 const PORT = process.env.PORT || 8080;
 const SELF_CONNECTION_INTERVAL = 30000; // 30 seconds
+const WS_URL = "https://chessroulette.onrender.com";
+
 
 const wss = new WebSocketServer({ port: 8080});
 
@@ -24,7 +26,7 @@ wss.on('connection', function connection(ws) {
 // This is to stop the server from sleeping on onrender
 function selfConnectToWebSocket() {
     console.log('Creating self WebSocket connection...');
-    const wsClient = new WebSocket(`ws://localhost:${PORT}`);  // Create the WebSocket client
+    const wsClient = new WebSocket(WS_URL);   // Create the WebSocket client
 
     // Once the connection is open, send a message and close the connection
     wsClient.onopen = () => {
