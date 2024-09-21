@@ -39,6 +39,8 @@ export const Game = () => {
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
     const [isConnecting, setIsConnecting] = useState(true); // Track connection state
     const [noOfMoves, setNoOfMoves] = useState(0);
+    const [waitingForOtherPlayer, setWaitingForOtherPlayer] = useState(false);
+    const [lastMove, setLastMove] = useState<any | null>(null);
 
     // const [, setAnswerHandled] = useState(false);
 
@@ -285,8 +287,9 @@ export const Game = () => {
                 case MOVE:
                     const move = message.payload;
                     chess.move(move);
+                    setLastMove(move);
                     setBoard(chess.board());
-                    console.log("Move");
+                    console.log(move);
                     console.log(MOVESOUND1);
                     MOVESOUND1.play();
                     setNoOfMoves(prevMoves => prevMoves + 1);
@@ -334,21 +337,21 @@ export const Game = () => {
         <div className="pt-8 max-w-screen-lg w-full">
             <div className="grid grid-cols-6 gap-4 w-full">
                 <div className="col-span-4 w-full flex justify-center">
-                    <ChessBoard colour={colour} socket={socket} board = {board} />
+                    <ChessBoard colour={colour} socket={socket} board = {board} lastMove = {lastMove}/>
                 </div>
                 <div className="col-span-2 w-full bg-slate-900 flex justify-center">
                     <div className="pt-8">
+                        {isConnecting && <div className="text-white">Connecting...</div>}
                         {!started && !isConnecting && <Button 
                             onclick={()=>{
                                 socket.send(JSON.stringify({
                                     type : INIT_GAME,
                                 }));
+                                setWaitingForOtherPlayer(true);
                             }} >
                             Play
                         </Button>}
-                        {isConnecting && <div className="text-white">Connecting...</div>}
-                        {/* {started && colour && <div className="text-white flex justify-center">{colour}</div>} */}
-                        {/* {started && <div className="text-white flex justify-center">{noOfMoves}</div>} */}
+                        {!started && waitingForOtherPlayer && <div className="text-white">Waiting for somebody to join...</div>}
                         <DashBoard noOfMoves={noOfMoves} started={started} colour={colour}/>
                         { started && myStream && <video id="local-video" autoPlay playsInline controls muted></video>}
                         { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
