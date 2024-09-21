@@ -5,9 +5,8 @@ import WebSocket from 'ws';
 console.log(WebSocket); // This should log the WebSocket class
 
 
-const PORT = process.env.PORT || 8080;
-const SELF_CONNECTION_INTERVAL = 30000; // 30 seconds
-const WS_URL = "https://chessroulette.onrender.com";
+const SELF_CONNECTION_INTERVAL = 30000;
+const WS_URL = "wss://chessroulette.onrender.com";
 
 
 const wss = new WebSocketServer({ port: 8080});
@@ -49,7 +48,7 @@ function selfConnectToWebSocket() {
 }
 
 // Start the WebSocket server
-console.log(`WebSocket server is running on port ${PORT}`);
+// console.log(`WebSocket server is running on port ${PORT}`);
 
 // Periodically make a self-connection to the WebSocket server
 setInterval(selfConnectToWebSocket, 30000); // Connect every 30 seconds
