@@ -20,3 +20,35 @@ wss.on('connection', function connection(ws) {
     ws.on('close', () => gameManager.removeUser(ws));
 });
 
+
+
+// This is to stop the server from sleeping on onrender
+function selfConnectToWebSocket() {
+    console.log('Creating self WebSocket connection...');
+    const wsClient = new WebSocket(WS_URL);   // Create the WebSocket client
+
+    // Once the connection is open, send a message and close the connection
+    wsClient.onopen = () => {
+        console.log('Self-connection established');
+        wsClient.send(JSON.stringify({ message: 'Ping from self-connection' }));  // Send a JSON message
+
+        // Close the connection after sending the message
+        wsClient.close();
+    };
+
+    // // Handle errors during the connection
+    // wsClient.onerror = (error) => {
+    //     console.error('Error in self WebSocket connection:', error);
+    // };
+
+    // Log disconnection
+    wsClient.onclose = () => {
+        console.log('Self WebSocket connection closed');
+    };
+}
+
+// Start the WebSocket server
+// console.log(`WebSocket server is running on port ${PORT}`);
+
+// Periodically make a self-connection to the WebSocket server
+setInterval(selfConnectToWebSocket, 30000); // Connect every 30 seconds

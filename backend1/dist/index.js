@@ -8,8 +8,8 @@ const GameManager_1 = require("./GameManager");
 // const WebSocket = require('ws');
 const ws_2 = __importDefault(require("ws"));
 console.log(ws_2.default); // This should log the WebSocket class
-const PORT = process.env.PORT || 8080;
-const SELF_CONNECTION_INTERVAL = 30000; // 30 seconds
+const SELF_CONNECTION_INTERVAL = 30000;
+const WS_URL = "wss://chessroulette.onrender.com";
 const wss = new ws_1.WebSocketServer({ port: 8080 });
 const gameManager = new GameManager_1.GameManager();
 wss.on('connection', function connection(ws) {
@@ -20,7 +20,7 @@ wss.on('connection', function connection(ws) {
 // This is to stop the server from sleeping on onrender
 function selfConnectToWebSocket() {
     console.log('Creating self WebSocket connection...');
-    const wsClient = new ws_2.default(`ws://localhost:${PORT}`); // Create the WebSocket client
+    const wsClient = new ws_2.default(WS_URL); // Create the WebSocket client
     // Once the connection is open, send a message and close the connection
     wsClient.onopen = () => {
         console.log('Self-connection established');
@@ -38,6 +38,6 @@ function selfConnectToWebSocket() {
     };
 }
 // Start the WebSocket server
-console.log(`WebSocket server is running on port ${PORT}`);
+// console.log(`WebSocket server is running on port ${PORT}`);
 // Periodically make a self-connection to the WebSocket server
 setInterval(selfConnectToWebSocket, 30000); // Connect every 30 seconds
