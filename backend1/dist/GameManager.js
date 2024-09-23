@@ -87,6 +87,13 @@ class GameManager {
                 }
                 console.log("ICE candidate received on backend");
             }
+            if (message.type === messages_1.RESET_BOARD) {
+                const game = this.games.find(game => game.player1 === socket || game.player2 === socket);
+                if (game) {
+                    game.resetBoard(socket);
+                }
+                console.log("Board reset request received on backend");
+            }
         });
     }
 }

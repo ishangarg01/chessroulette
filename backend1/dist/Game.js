@@ -124,5 +124,27 @@ class Game {
             candidate: candidate
         }));
     }
+    resetBoard(socket) {
+        // Reset the board
+        this.board.reset();
+        // Randomly swap player1 and player2
+        const random = Math.random();
+        let newPlayer1 = random > 0.5 ? this.player1 : this.player2;
+        let newPlayer2 = random > 0.5 ? this.player2 : this.player1;
+        // Send reset signal and assign new colors
+        newPlayer1.send(JSON.stringify({
+            type: messages_1.RESET_BOARD,
+            payload: { color: "white" }
+        }));
+        newPlayer2.send(JSON.stringify({
+            type: messages_1.RESET_BOARD,
+            payload: { color: "black" }
+        }));
+        // Update the internal player references
+        this.player1 = newPlayer1;
+        this.player2 = newPlayer2;
+        // Reset move count and game state
+        this.moveCount = 0;
+    }
 }
 exports.Game = Game;
