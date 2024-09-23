@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { ANSWER, INIT_GAME, MOVE, NEGO_OFFER, NEGO_ANSWER, OFFER, ADD_TRACKS } from "./messages";
+import { ANSWER, INIT_GAME, MOVE, NEGO_OFFER, NEGO_ANSWER, OFFER, ADD_TRACKS, RESET_BOARD } from "./messages";
 import { Game } from "./Game";
 
 export class GameManager {
@@ -85,6 +85,12 @@ export class GameManager {
                 const game2 = this.games.find(game=>game.player2 === socket);
                 if (game2) { game2.sendIceCandidateToPlayer1(socket, message.candidate);}
                 console.log("ICE candidate received on backend");
+            }
+
+            if(message.type === RESET_BOARD){
+                const game = this.games.find(game=>game.player1 === socket || game.player2 === socket);
+                if (game) { game.resetBoard(socket);}
+                console.log("Board reset request received on backend");
             }
 
 

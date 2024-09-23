@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import { WebSocket } from "ws";
-import { ADD_TRACKS, ANSWER, GAME_OVER, INIT_GAME, NEGO_ANSWER, NEGO_OFFER, OFFER } from "./messages";
+import { ADD_TRACKS, ANSWER, GAME_OVER, INIT_GAME, NEGO_ANSWER, NEGO_OFFER, OFFER, RESET_BOARD } from "./messages";
 import { MOVE } from "./messages";
 
 export class Game {
@@ -24,7 +24,6 @@ export class Game {
             payload: {color: "black"}
         }));   
         this.moveCount = 0;
-                    
     }
 
     makeMove(socket: WebSocket, move:{from: string, to: string}){
@@ -144,5 +143,32 @@ export class Game {
             type: "ice_candidate",
             candidate: candidate
         }));
+    }
+
+    resetBoard(socket: WebSocket) {
+        // Reset the board
+        this.board.reset();
+        
+        // Randomly swap player1 and player2
+        const random = Math.random();
+        let newPlayer1 = random > 0.5 ? this.player1 : this.player2;
+        let newPlayer2 = random > 0.5 ? this.player2 : this.player1;
+
+        // Send reset signal and assign new colors
+        newPlayer1.send(JSON.stringify({
+            type: RESET_BOARD,
+            payload: { color: "white" }
+        }));
+        newPlayer2.send(JSON.stringify({
+            type: RESET_BOARD,
+            payload: { color: "black" }
+        }));
+
+        // Update the internal player references
+        this.player1 = newPlayer1;
+        this.player2 = newPlayer2;
+
+        // Reset move count and game state
+        this.moveCount = 0;
     }
 }

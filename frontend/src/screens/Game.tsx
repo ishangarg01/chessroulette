@@ -17,7 +17,7 @@ export const ANSWER = "answer";
 export const NEGO_OFFER = "offer_for_negotiation";
 export const NEGO_ANSWER = "answer_for_negotiation";
 export const ADD_TRACKS = "add_tracks";
-
+export const RESET_BOARD = "reset_board";
 // const peer = new PeerService();
 
 
@@ -209,6 +209,16 @@ export const Game = () => {
         // remoteVideoRef.srcObject = remoteStream;
     },[]); 
 
+    const restartGame = useCallback(() => {
+        if (!socket) return;
+        chess.reset(); // Reset the chess game to the initial position
+        setBoard(chess.board()); // Update the board state
+        setNoOfMoves(0); // Reset the move counter
+        setLastMove(null); // Clear the last move
+        console.log("Game Restarted");
+    }, [chess, colour, socket]);
+
+
     useEffect(() => {
         if (started && colour === "white") {
           sendOffer();
@@ -320,6 +330,10 @@ export const Game = () => {
                         console.log('Storing ICE candidate...: ', candidate, iceCandidates.current);
                     }
                     break;
+                case RESET_BOARD:
+                    setColour(message.payload.color);
+                    restartGame();
+                    break;
                 default:
                     console.log("Unknown message type in Game");
             }
@@ -399,6 +413,14 @@ export const Game = () => {
                                 console.log("remoteStream assigned to video element:", remoteStream);
                             }
                         }}>Refresh</Button></div>}
+
+                        { started && 
+                        <Button onclick={()=>{// Notify the opponent about the restart
+                            socket.send(JSON.stringify({
+                                type : RESET_BOARD,
+                            }));}}>
+                            Play another game
+                        </Button>}
                         
                     </div>
                 </div>
@@ -408,6 +430,8 @@ export const Game = () => {
             <div>
                 <Button onclick={()=>{resetGame()}}>New Game</Button>
             </div>
+
+            
             
         
         </div>

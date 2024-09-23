@@ -6,3 +6,4 @@ export const ANSWER = "answer";
 export const NEGO_OFFER = "offer_for_negotiation";
 export const NEGO_ANSWER = "answer_for_negotiation";
 export const ADD_TRACKS = "add_tracks";
+export const RESET_BOARD = "reset_board";
