@@ -23,7 +23,8 @@ export const ADD_TRACKS = "add_tracks";
 
 
 export const Game = () => {
-    const socket = useSocket();
+    
+    const { socket, isConnected, resetSocket } = useSocket();
     // const navigate = useNavigate();
 
 
@@ -37,7 +38,7 @@ export const Game = () => {
     // Specify MediaStream as the type for both state variables
     const [myStream, setMyStream] = useState<MediaStream|null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream|null>(null);
-    const [isConnecting, setIsConnecting] = useState(true); // Track connection state
+    // const [isConnecting, setIsConnecting] = useState(true); // Track connection state
     const [noOfMoves, setNoOfMoves] = useState(0);
     const [waitingForOtherPlayer, setWaitingForOtherPlayer] = useState(false);
     const [lastMove, setLastMove] = useState<any | null>(null);
@@ -266,13 +267,13 @@ export const Game = () => {
     useEffect(() => {
         if(!socket) return;
 
-        socket.onopen = () => {
-            setIsConnecting(false); // Connection established
-        };
+        // socket.onopen = () => {
+        //     setIsConnecting(false); // Connection established
+        // };
 
-        socket.onclose = () => {
-            setIsConnecting(true); // Connection closed or lost
-        };
+        // socket.onclose = () => {
+        //     setIsConnecting(true); // Connection closed or lost
+        // };
 
         socket.onmessage = async (event) => {
             const message = await JSON.parse(event.data);
@@ -329,6 +330,28 @@ export const Game = () => {
         }
     }, [socket]);
 
+    const resetGame = useCallback(() => {
+        // Stop and reset streams
+        myStream?.getTracks().forEach(track => track.stop());
+        remoteStream?.getTracks().forEach(track => track.stop());
+    
+        // Reset states
+        setStarted(false);
+        setNoOfMoves(0);
+        setWaitingForOtherPlayer(false);
+        setMyStream(null);
+        setRemoteStream(null);
+        setLastMove(null);
+        setColour("white");
+        setBoard(chess.board());
+    
+        // Reset refs
+        peer.current = null;
+        iceCandidates.current = [];
+    
+        // Reset socket connection
+        resetSocket();
+      }, [myStream, remoteStream, resetSocket, chess]);
 
     if(!socket) {return <div>Connecting...</div>}
     
@@ -341,8 +364,8 @@ export const Game = () => {
                 </div>
                 <div className="col-span-2 w-full bg-slate-900 flex justify-center">
                     <div className="pt-8">
-                        {isConnecting && <div className="text-white">Connecting...</div>}
-                        {!started && !isConnecting && <Button 
+                        {!isConnected && <div className="text-white">Connecting...</div>}
+                        {!started && isConnected && <Button 
                             onclick={()=>{
                                 socket.send(JSON.stringify({
                                     type : INIT_GAME,
@@ -379,7 +402,14 @@ export const Game = () => {
                         
                     </div>
                 </div>
+                
             </div>
+
+            <div>
+                <Button onclick={()=>{resetGame()}}>New Game</Button>
+            </div>
+            
+        
         </div>
     </div>
     </div>
