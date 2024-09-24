@@ -28,25 +28,62 @@ export const ChessBoard = ({colour,board, socket, lastMove} :
                     const squareRepresentation = String.fromCharCode(97 + (j%8)) +""+ (8 - i) as Square;
                     const isLastMoveSquare = lastMove && (squareRepresentation === lastMove.from || squareRepresentation === lastMove.to);
                     const baseColor = (i + j) % 2 === 0 ? "bg-green-100" : "bg-green-500";
-                    const highlightColor = isLastMoveSquare ? "bg-yellow-200" : baseColor;
+                    const isFromSquare = from === squareRepresentation;  // Check if this is the "from" square           
+                    let highlightColor = baseColor;  // Default to the base color
 
+                    if (isFromSquare) {
+                        // Apply special color for the "from" square
+                        highlightColor = (i + j) % 2 === 0 ? "bg-green-200" : "bg-green-400";  // Yellow for white squares, green for dark squares
+                    } else if (isLastMoveSquare) {
+                        // Highlight last move squares with yellow
+                        highlightColor = "bg-yellow-200";
+                    }
 
                     return <div onClick={() => {
                         // if the square is empty from should not be set
                         // if from is set but the square if filled by the same color piece then that should be from.
-                        if(!from){
-                            setFrom(squareRepresentation);
-                            console.log("move from ",squareRepresentation);
-                        }
-                        else {
-                            socket.send(JSON.stringify({
-                                type: MOVE,
-                                payload: {
-                                    move : {from: from,
-                                    to: squareRepresentation,}
-                                }
-                            }));
-                            setFrom(null);
+                        // if(!from){
+                        //     setFrom(squareRepresentation);
+                        //     console.log("move from ",squareRepresentation);
+                        // }
+                        // else {
+                        //     socket.send(JSON.stringify({
+                        //         type: MOVE,
+                        //         payload: {
+                        //             move : {from: from,
+                        //             to: squareRepresentation,}
+                        //         }
+                        //     }));
+                        //     setFrom(null);
+                        // }
+
+                        if (!from) {
+                            // If "from" is not set, only set it if the square has a piece of the player's color
+                            if (square && square.color === colour[0]) {
+                                setFrom(squareRepresentation);
+                                console.log("move from ", squareRepresentation);
+                            } else {
+                                console.log("Invalid from selection");
+                            }
+                        } else {
+                            // If "from" is already set
+                            if (square && square.color === colour[0]) {
+                                // If the clicked square has a piece of the player's color, update "from" to the new piece
+                                setFrom(squareRepresentation);
+                                console.log("updated move from ", squareRepresentation);
+                            } else {
+                                // Otherwise, attempt the move
+                                socket.send(JSON.stringify({
+                                    type: MOVE,
+                                    payload: {
+                                        move: {
+                                            from: from,
+                                            to: squareRepresentation,
+                                        }
+                                    }
+                                }));
+                                setFrom(null); // reset "from" after making the move
+                            }
                         }
                     }
                 } key={j} className={`w-16 h-16  ${highlightColor}` }>
