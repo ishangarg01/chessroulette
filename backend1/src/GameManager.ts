@@ -29,11 +29,19 @@ export class GameManager {
             
             if (message.type === INIT_GAME) {
                 if(this.pendingUser && this.pendingUser!==socket){
-                    // start a game
-                    const game = new Game(this.pendingUser, socket);
-                    this.games.push(game);
-                    this.pendingUser = null;
-                    // you will recieve a 
+                    // Try to send a message to the pending user
+                    try {
+                        this.pendingUser.send(JSON.stringify({ type: "game_starting" }));
+                        
+                        // If the message is sent successfully, start a game
+                        const game = new Game(this.pendingUser, socket);
+                        this.games.push(game);
+                        this.pendingUser = null; // Clear the pending user
+                    } catch (error) {
+                        console.error("Failed to send message to pending user:", error);
+                        // If unable to send message, make the incoming socket the new pending user
+                        this.pendingUser = socket;
+                    }
 
                 } else {
                     this.pendingUser = socket; 
