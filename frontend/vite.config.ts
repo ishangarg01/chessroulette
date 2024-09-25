@@ -17,4 +17,9 @@ export default defineConfig({
     },
     host: true,  // This allows access to the development server from other devices on your network
   },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 });

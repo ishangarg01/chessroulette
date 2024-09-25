@@ -6,6 +6,7 @@ import { Chess } from "chess.js";
 import PeerService from '../services/peer';
 import {MOVESOUND1} from '../../public/Sounds/sounds';
 import { DashBoard } from "../components/DashBoard";
+import { SkeletonGame } from "../components/Skeleton";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -367,32 +368,57 @@ export const Game = () => {
         resetSocket();
       }, [myStream, remoteStream, resetSocket, chess]);
 
-    if(!socket) {return <div>Connecting...</div>}
+    // if(!socket) {return <div>Connecting...</div>}
+    if(!socket) {return <SkeletonGame/>}
     
     return <div className="bg-black h-screen">
     <div className="flex justify-center">
         <div className="pt-8 max-w-screen-lg w-full">
-            <div className="grid grid-cols-6 gap-4 w-full">
+            <div className="grid grid-cols-6 gap-4 w-full m-8">
                 <div className="col-span-4 w-full flex justify-center">
+                    <div className="w-full flex flex-col items-center">
                     <ChessBoard colour={colour} socket={socket} board = {board} lastMove = {lastMove}/>
+                    <div className="flex flex-row mt-4 items-start">
+                        {started && <Button onclick={()=>{resetGame()}}>New Player</Button>}
+                        { started && 
+                                <div className="ml-4"><Button onclick={()=>{// Notify the opponent about the restart
+                                    socket.send(JSON.stringify({
+                                        type : RESET_BOARD,
+                                    }));}}>
+                                    Play another game
+                                </Button></div>
+                        }
+                    </div>
+                    </div>
                 </div>
                 <div className="col-span-2 w-full bg-slate-900 flex justify-center">
-                    <div className="pt-8">
+                    <div className="pt-4 pb-4">
+                        { started && myStream && <video id="local-video" autoPlay playsInline controls muted className="rounded-lg"></video>}
+                        { started && remoteStream && <video id="remote-video" autoPlay playsInline controls className="rounded-lg mt-4"></video>}
                         {!isConnected && <div className="text-white">Connecting...</div>}
-                        {!started && isConnected && <Button 
-                            onclick={()=>{
-                                socket.send(JSON.stringify({
-                                    type : INIT_GAME,
-                                }));
-                                setWaitingForOtherPlayer(true);
-                            }} >
-                            Play
-                        </Button>}
-                        {!started && waitingForOtherPlayer && <div className="text-white">Waiting for somebody to join...</div>}
+                        <div className="flex flex-col items-center justify-center">
+                            {!started && isConnected && (
+                                <Button
+                                    onclick={() => {
+                                        socket.send(JSON.stringify({
+                                            type: INIT_GAME,
+                                        }));
+                                        setWaitingForOtherPlayer(true);
+                                    }}
+                                >
+                                    Play
+                                </Button>
+                            )}
+
+                            {!started && waitingForOtherPlayer && (
+                                <div className="text-white break-words whitespace-normal mt-4">
+                                    Waiting for somebody to join...
+                                </div>
+                            )}
+                        </div>
+
                         <DashBoard noOfMoves={noOfMoves} started={started} colour={colour}/>
-                        { started && myStream && <video id="local-video" autoPlay playsInline controls muted></video>}
-                        { started && remoteStream && <video id="remote-video" autoPlay playsInline controls></video>}
-                        { started && <div className="flex justify-center"><Button onclick={()=>{
+                        {/* { started && <div className="flex justify-center"><Button onclick={()=>{
                             console.log("remote stream : ", remoteStream);
                             if (iceCandidates.current.length > 0) {
                                 console.log('Adding stored ICE candidates...');
@@ -412,24 +438,16 @@ export const Game = () => {
                                 remoteVideoRef.srcObject = remoteStream;
                                 console.log("remoteStream assigned to video element:", remoteStream);
                             }
-                        }}>Refresh</Button></div>}
+                        }}>Refresh</Button></div>} */}
 
-                        { started && 
-                        <Button onclick={()=>{// Notify the opponent about the restart
-                            socket.send(JSON.stringify({
-                                type : RESET_BOARD,
-                            }));}}>
-                            Play another game
-                        </Button>}
+                        
                         
                     </div>
                 </div>
                 
             </div>
 
-            <div>
-                <Button onclick={()=>{resetGame()}}>New Game</Button>
-            </div>
+            
 
             
             
