@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Landing } from './screens/Landing'
 import { Game } from './screens/Game'
+import { Analytics } from "@vercel/analytics/react"
+
 function App() {
   return (
     <>
@@ -10,6 +12,7 @@ function App() {
           <Route path="/game" element={<Game/>} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </>
   )
 }
